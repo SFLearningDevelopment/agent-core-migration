@@ -1,0 +1,134 @@
+<!-- build: 2026072801 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certification Exam · AgentCore Migration Lab</title>
+<link rel="stylesheet" href="lab.css?v=2026072801">
+<style>
+  .exam-q{border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin:16px 0;background:#fff;box-shadow:var(--shadow)}
+  .exam-q .q{font-weight:600;margin-bottom:10px}
+  .exam-q .opt{display:block;border:1px solid var(--line);border-radius:8px;padding:10px 13px;margin:7px 0;cursor:pointer}
+  .exam-q .opt:hover{border-color:var(--blue);background:var(--blue-tint)}
+  .exam-q.reviewed .opt.correct{border-color:var(--ok);background:var(--ok-tint)}
+  .exam-q.reviewed .opt.chosen-wrong{border-color:#c0392b;background:#fbecea}
+  .result{border-radius:var(--radius);padding:20px;margin:18px 0;text-align:center;display:none}
+  .result.pass{background:var(--ok-tint);border:1px solid var(--ok)}
+  .result.fail{background:var(--warn-tint);border:1px solid var(--warn)}
+  .result .score{font-size:34px;font-weight:800;margin:0 0 4px}
+  .result.pass .score{color:var(--ok)} .result.fail .score{color:var(--warn)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="agentcore-dashboard.html?v=2026072801">AgentCore Migration Lab</a>
+    <span class="crumb">/ Certification exam</span>
+    <span class="spacer"></span>
+    <span class="pill">Pass mark 75%</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>SF Certified AgentCore Migration Practitioner</h1>
+    <p class="sub">Eight questions covering the CLI transition, the four-command workflow, and Bedrock Agents Classic migration. Score 75% or higher (6 of 8) to pass.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section>
+    <div id="exam"></div>
+    <div class="linkrow">
+      <button class="btn" id="submitBtn">Submit exam</button>
+      <a class="btn ghost" href="agentcore-dashboard.html?v=2026072801">Back to dashboard</a>
+    </div>
+    <div class="result" id="result">
+      <p class="score" id="scoreText"></p>
+      <p id="verdictText"></p>
+    </div>
+  </section>
+  <div class="footer">SF Knowledge Hub · AgentCore Migration Lab · Certification exam</div>
+</div>
+
+<script>
+/* ---- Question bank ---- */
+var QUESTIONS=[
+  {q:"The Bedrock AgentCore Starter Toolkit has been replaced. What is its successor, and in what runtime does it ship?",
+   opts:["A Python package installed with pip","The Node.js AgentCore CLI, package @aws/agentcore","A managed AWS console wizard only","The Bedrock Agents Classic console"],a:1},
+  {q:"Why must you uninstall the Starter Toolkit before using the AgentCore CLI?",
+   opts:["They require conflicting Python versions","Both register the same 'agentcore' command and collide","The CLI cannot deploy while the toolkit is present","AWS bills for both if both are installed"],a:1},
+  {q:"Which prerequisite pair is correct for the AgentCore CLI workflow?",
+   opts:["Node.js 20+ for the CLI, Python 3.10+ for the generated agent","Python only","Node.js only","Java 17 and Go"],a:0},
+  {q:"What is the correct order of the core AgentCore CLI lifecycle?",
+   opts:["deploy → create → invoke → dev","create → dev → deploy → invoke","dev → deploy → create → invoke","create → deploy → dev → invoke"],a:1},
+  {q:"You want the fastest path to a running agent with no orchestration code to maintain. You should use:",
+   opts:["A code-based agent with LangGraph","A Bedrock Agents Classic agent","The managed harness","The Starter Toolkit"],a:2},
+  {q:"As of July 30, 2026, Bedrock Agents (now 'Classic') is:",
+   opts:["Deleted, with all agents removed","In maintenance mode and closed to new customers; existing agents keep running","Renamed to AgentCore with no other change","Available only in one region"],a:1},
+  {q:"On AgentCore, the Lambda-backed action groups of a Classic agent most directly become:",
+   opts:["Knowledge bases","Guardrails","Additional foundation models","Tools added with 'agentcore add tool'"],a:3},
+  {q:"After running 'agentcore add tool', what must you do for the change to take effect in AWS?",
+   opts:["Nothing — add applies immediately","Run 'agentcore deploy' again","Reinstall the CLI","Recreate the project"],a:1}
+];
+
+/* ---- Render ---- */
+var examEl=document.getElementById('exam');
+QUESTIONS.forEach(function(item,i){
+  var div=document.createElement('div');
+  div.className='exam-q'; div.dataset.answer=item.a; div.dataset.idx=i;
+  var html='<div class="q">'+(i+1)+'. '+item.q+'</div>';
+  item.opts.forEach(function(o,j){
+    html+='<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>';
+  });
+  div.innerHTML=html; examEl.appendChild(div);
+});
+
+/* ---- Score ---- */
+document.getElementById('submitBtn').addEventListener('click',function(){
+  var qs=document.querySelectorAll('.exam-q'), correct=0, answered=0;
+  qs.forEach(function(qd){
+    var ans=parseInt(qd.dataset.answer,10);
+    var sel=qd.querySelector('input:checked');
+    qd.classList.add('reviewed');
+    var opts=qd.querySelectorAll('.opt');
+    opts[ans].classList.add('correct');
+    if(sel){
+      answered++;
+      var chosen=parseInt(sel.value,10);
+      if(chosen===ans){correct++;}
+      else{opts[chosen].classList.add('chosen-wrong');}
+    }
+  });
+  var pct=Math.round(correct/QUESTIONS.length*100);
+  var pass=pct>=75;
+  var res=document.getElementById('result');
+  res.className='result '+(pass?'pass':'fail');
+  res.style.display='block';
+  document.getElementById('scoreText').textContent=correct+' / '+QUESTIONS.length+'  ('+pct+'%)';
+  document.getElementById('verdictText').textContent = pass
+    ? 'Passed. You have earned the SF Certified AgentCore Migration Practitioner certification.'
+    : (answered<QUESTIONS.length ? 'Some questions were left blank. Answer all eight and aim for 75% or higher.' : 'Below the 75% pass mark. Review the tiers and retake the exam.');
+  res.scrollIntoView({behavior:'smooth',block:'center'});
+
+  /* ---- INTEGRATION STUB (wire against live files) ----
+     Write the attempt to Firestore in the same shape the Knowledge Hub uses:
+       courseExamResults/{email}/courses/{CP_COURSE_ID}/attempts/{autoId}
+     Fields to match existing courses: { score: pct, passed: pass,
+       correct, total: QUESTIONS.length, ts: serverTimestamp(), courseId: CP_COURSE_ID }
+     Also update courseProgress/{uid} moduleKeys for the three tier pages
+     (agentcore-tier-1, agentcore-tier-2, agentcore-tier-3) per platform convention.
+     Left as a stub because this must be built against the latest deployed
+     firebase-init / auth code, not a cached copy. ------------------------- */
+  saveAttempt(pct, pass, correct);
+});
+
+function saveAttempt(pct, pass, correct){
+  // Placeholder — no-op until wired to the deployed Firestore init + auth.
+  // console.log('attempt', {pct, pass, correct});
+}
+</script>
+</body>
+</html>
