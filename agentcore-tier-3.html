@@ -1,0 +1,161 @@
+<!-- build: 2026072801 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tier 3 · AgentCore Migration Lab</title>
+<link rel="stylesheet" href="lab.css?v=2026072801">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="agentcore-dashboard.html?v=2026072801">AgentCore Migration Lab</a>
+    <span class="crumb">/ Tier 3</span>
+    <span class="spacer"></span>
+    <span class="pill">Migration</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Tier 3 — From Bedrock Agents Classic to AgentCore</h1>
+    <p class="sub">Now bring an existing agent across. You'll map each piece of a Classic configuration onto its AgentCore equivalent, then decide harness or code and wire up tools, memory and observability.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>What "maintenance mode" means for you</h2>
+    <p>Amazon Bedrock Agents — launched November 2023 — is now <strong>Bedrock Agents Classic</strong>. As of <strong>July 30, 2026</strong> it is closed to new customers and in maintenance mode. Existing agents keep working; your Bedrock models, Knowledge Bases and Guardrails are unaffected. AWS recommends migrating Classic workloads to AgentCore.</p>
+    <div class="note warn">
+      <span class="lbl">Exam framing</span>
+      <p style="margin:6px 0 0">"Maintenance mode + closed to new customers" ≠ "shut down." If a question implies existing Classic agents stop running, that's the distractor. Your Knowledge Bases and Guardrails are reusable assets, not casualties of the migration.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Map the configuration</h2>
+    <p>Before deploying anything, take the Classic agent's configuration apart and line each element up against its AgentCore counterpart.</p>
+    <table class="cmp">
+      <tr><th>Bedrock Agents Classic</th><th>AgentCore equivalent</th></tr>
+      <tr><td>Foundation model + prompt instructions</td><td>Model + system prompt (harness config, or your agent code)</td></tr>
+      <tr><td>Action groups (Lambda-backed functions)</td><td>Tools added via <code>agentcore add tool</code></td></tr>
+      <tr><td>Knowledge Bases</td><td>Knowledge bases attached to the agent (Classic KBs are reusable)</td></tr>
+      <tr><td>Prompt overrides / advanced prompts</td><td>Prompt configuration on the harness, or logic in code</td></tr>
+      <tr><td>Session / conversation memory</td><td>AgentCore Memory</td></tr>
+      <tr><td>CloudWatch traces</td><td>AgentCore Observability (OpenTelemetry)</td></tr>
+    </table>
+
+    <details class="primer">
+      <summary>Primer: the import shortcut</summary>
+      <div class="inner">
+        <p>You don't have to map everything by hand. The AgentCore CLI can import an existing Bedrock Agents Classic configuration as a starting point for either the harness or a code-based agent. Import-Agent tooling can also migrate Classic agents into LangGraph or Strands while wiring in AgentCore primitives like Memory, Code Interpreter and Gateway.</p>
+        <p>Even with import, understanding the manual mapping matters — the exam tests the mapping, and import gives you a starting point you still have to review.</p>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Choose your path</h2>
+    <p>Use the <strong>managed harness</strong> unless you have a specific reason to own the loop. A reason to go <strong>code-based</strong>: you already have an agent codebase to migrate, or you need orchestration the harness doesn't yet express. For a straightforward Classic agent — model, a few action groups, a knowledge base — the harness is usually the cleaner target.</p>
+  </section>
+
+  <section>
+    <h2>Do it</h2>
+
+    <div class="step">
+      <div class="n">Step 1 · Review the Classic agent</div>
+      <p>List its model, action groups, knowledge bases and prompt overrides. Each becomes a harness parameter or a tool. Write them down before you touch the CLI.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 2 · Scaffold the target (harness path)</div>
+      <pre><code>agentcore create
+# choose the managed harness, set model + prompt from the Classic agent</code></pre>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 3 · Add tools for each action group</div>
+      <p>Where Classic used Lambda-backed action groups, add AgentCore tools. Built-in tools cover common needs:</p>
+      <pre><code>agentcore add tool --harness my-research-agent \
+  --type agentcore_browser --name browser
+
+agentcore add tool --harness my-research-agent \
+  --type agentcore_code_interpreter --name code-interpreter</code></pre>
+      <p>Custom action-group logic maps to your own tools rather than these built-ins.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 4 · Attach memory and knowledge, then deploy</div>
+      <p>Add AgentCore Memory where the Classic agent relied on session memory, and attach your (reusable) knowledge bases. Then apply everything:</p>
+      <pre><code>agentcore deploy</code></pre>
+      <p>Remember from Tier 2: <code>add</code> changes only take effect in AWS after a <code>deploy</code>.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 5 · Verify behaviour parity</div>
+      <pre><code>agentcore invoke "&lt;a prompt the Classic agent handled&gt;" --stream</code></pre>
+      <p>Compare the response and the tool calls against the Classic agent's behaviour. Check traces in CloudWatch (Observability) to confirm the tools fired as expected.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Check your understanding</h2>
+    <div class="mcq" data-answer="b">
+      <div class="q">A Bedrock Agents Classic agent uses two Lambda-backed action groups. On AgentCore, these most directly become:</div>
+      <label class="opt"><input type="radio" name="q1" value="a">Knowledge bases</label>
+      <label class="opt"><input type="radio" name="q1" value="b">Tools added with <code>agentcore add tool</code></label>
+      <label class="opt"><input type="radio" name="q1" value="c">Additional foundation models</label>
+      <label class="opt"><input type="radio" name="q1" value="d">Guardrails</label>
+      <div class="fb ok">Correct. Action groups map to AgentCore tools; built-in types cover common cases and custom logic becomes your own tools.</div>
+      <div class="fb no">Not quite. Action groups are how a Classic agent calls functions — on AgentCore that role is filled by tools you add with <code>agentcore add tool</code>.</div>
+    </div>
+    <div class="mcq" data-answer="d">
+      <div class="q">A team asks whether migrating to AgentCore will delete their existing Bedrock Knowledge Bases and Guardrails. The accurate answer is:</div>
+      <label class="opt"><input type="radio" name="q2" value="a">Yes — Classic assets are removed when the service enters maintenance mode</label>
+      <label class="opt"><input type="radio" name="q2" value="b">Yes — they must be rebuilt from scratch in AgentCore</label>
+      <label class="opt"><input type="radio" name="q2" value="c">Only Guardrails are removed; Knowledge Bases are kept</label>
+      <label class="opt"><input type="radio" name="q2" value="d">No — Bedrock models, Knowledge Bases and Guardrails are unaffected and reusable</label>
+      <div class="fb ok">Correct. Maintenance mode closes Classic to new agents; it does not remove Bedrock models, Knowledge Bases or Guardrails.</div>
+      <div class="fb no">Not quite. Maintenance mode only closes Classic to new customers — Bedrock models, Knowledge Bases and Guardrails keep working and can be reused.</div>
+    </div>
+    <div id="gate" class="gate">Answer both questions correctly to unlock the certification exam.</div>
+    <div class="linkrow" id="next" style="display:none">
+      <a class="btn" href="agentcore-exam.html?v=2026072801">Go to the exam →</a>
+    </div>
+  </section>
+
+  <div class="footer">SF Knowledge Hub · AgentCore Migration Lab · Tier 3</div>
+</div>
+
+<script>
+var solved={};
+var total=document.querySelectorAll('.mcq').length;
+document.querySelectorAll('.mcq').forEach(function(mcq,idx){
+  var answer=mcq.dataset.answer;
+  mcq.querySelectorAll('.opt input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      mcq.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+      var label=inp.closest('.opt');
+      var ok=mcq.querySelector('.fb.ok'), no=mcq.querySelector('.fb.no');
+      ok.classList.remove('show'); no.classList.remove('show');
+      if(inp.value===answer){
+        label.classList.add('correct'); ok.classList.add('show'); solved[idx]=true;
+      }else{
+        label.classList.add('wrong');
+        mcq.querySelector('.opt input[value="'+answer+'"]').closest('.opt').classList.add('correct');
+        no.classList.add('show'); solved[idx]=false;
+      }
+      if(Object.keys(solved).length===total && Object.values(solved).every(Boolean)){
+        document.getElementById('gate').style.display='none';
+        document.getElementById('next').style.display='flex';
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
