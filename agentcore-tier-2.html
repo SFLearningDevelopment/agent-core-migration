@@ -1,0 +1,144 @@
+<!-- build: 2026072801 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tier 2 · AgentCore Migration Lab</title>
+<link rel="stylesheet" href="lab.css?v=2026072801">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="agentcore-dashboard.html?v=2026072801">AgentCore Migration Lab</a>
+    <span class="crumb">/ Tier 2</span>
+    <span class="spacer"></span>
+    <span class="pill">Core workflow</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Tier 2 — Create, test, deploy, invoke</h1>
+    <p class="sub">The AgentCore CLI takes you from an empty folder to a deployed agent in four commands. Learn the loop first; migration in Tier 3 reuses every step of it.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>The four-command loop</h2>
+    <p>The whole lifecycle is <code>create</code> → <code>dev</code> → <code>deploy</code> → <code>invoke</code>. You scaffold a project, run it on your machine, push it to AWS, then call the deployed version.</p>
+
+    <details class="primer">
+      <summary>Primer: two ways to build the same agent</summary>
+      <div class="inner">
+        <p>AgentCore gives you two starting points, both driven by the same CLI:</p>
+        <p><strong>Managed harness.</strong> You declare the agent in config — model, prompt, tools, memory — and AgentCore runs the reasoning loop for you. No orchestration code. This is the fastest route from idea to a running agent, and the default recommendation unless you have a reason not to use it.</p>
+        <p><strong>Code-based agent.</strong> You own the loop yourself using a framework such as Strands Agents, LangGraph, Google ADK, or OpenAI Agents. Choose this when you have existing agent code to bring across or orchestration the harness can't yet express.</p>
+        <p>This tier uses a code-based Python agent with Strands so the mechanics are visible. Keep the harness in mind — Tier 3 weighs the two for migration.</p>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Do it</h2>
+
+    <div class="step">
+      <div class="n">Step 1 · Scaffold</div>
+      <pre><code>agentcore create
+cd my-project</code></pre>
+      <p>An interactive wizard walks you through framework, language, and model provider. To skip the prompts and take Python + Strands + Bedrock with no memory, use:</p>
+      <pre><code>agentcore create --defaults</code></pre>
+      <p><code>create</code> initialises a git repository by default. If git isn't installed or your config errors out, add <code>--skip-git</code>.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 2 · Test locally</div>
+      <pre><code>agentcore dev</code></pre>
+      <p>This starts a local development server that watches for file changes and exposes a local invocation endpoint. In a second terminal, send it a prompt:</p>
+      <pre><code>agentcore invoke "What can you do?" --stream</code></pre>
+      <p><code>--stream</code> shows the response as it's generated. If your provider needs an API key (OpenAI, Anthropic, Gemini), set it in <code>agentcore/.env.local</code> before this step.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 3 · Deploy to AWS</div>
+      <pre><code>agentcore deploy</code></pre>
+      <p>The CLI uses AWS CDK to provision the AgentCore Runtime resources and push your agent. This is where your <code>aws configure</code> credentials and region matter.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 4 · Invoke the deployed agent</div>
+      <pre><code>agentcore invoke "Summarise today's top task" --stream</code></pre>
+      <p>With no local <code>dev</code> server running, <code>invoke</code> calls the deployed Runtime endpoint instead of localhost. Same command, different target — that's the point.</p>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Remember</span>
+      <p style="margin:6px 0 0">After you <code>add</code> or <code>remove</code> resources (Tier 3), run <code>agentcore deploy</code> again to apply the change in AWS. The config on disk and the resources in AWS only match after a deploy.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Observability, for free</h2>
+    <p>The scaffolded project pulls in the OpenTelemetry distribution as a dependency, so AgentCore Runtime collects traces and logs automatically. To view them, enable CloudWatch Transaction Search for your account, then inspect traces in CloudWatch. You don't wire this up by hand — you turn it on and read it.</p>
+  </section>
+
+  <section>
+    <h2>Check your understanding</h2>
+    <div class="mcq" data-answer="c">
+      <div class="q">You run <code>agentcore invoke "hello"</code> with no <code>agentcore dev</code> server running. What does it call?</div>
+      <label class="opt"><input type="radio" name="q1" value="a">Nothing — <code>invoke</code> requires the local dev server</label>
+      <label class="opt"><input type="radio" name="q1" value="b">The legacy Bedrock Agents Classic endpoint</label>
+      <label class="opt"><input type="radio" name="q1" value="c">The deployed agent on AgentCore Runtime</label>
+      <label class="opt"><input type="radio" name="q1" value="d">A local mock that returns canned responses</label>
+      <div class="fb ok">Correct. With no local dev server, <code>invoke</code> targets the deployed Runtime endpoint. With <code>dev</code> running, it hits localhost.</div>
+      <div class="fb no">Not quite. <code>invoke</code> works against a deployed agent too — with no local <code>dev</code> server up, it calls the AgentCore Runtime endpoint you deployed to.</div>
+    </div>
+    <div class="mcq" data-answer="a">
+      <div class="q">You want the fastest route from idea to a running agent, with no orchestration code to maintain. Which build style fits?</div>
+      <label class="opt"><input type="radio" name="q2" value="a">The managed harness — declare the agent in config and let AgentCore run the loop</label>
+      <label class="opt"><input type="radio" name="q2" value="b">A code-based agent with LangGraph</label>
+      <label class="opt"><input type="radio" name="q2" value="c">A Bedrock Agents Classic agent</label>
+      <label class="opt"><input type="radio" name="q2" value="d">The Starter Toolkit's <code>agentcore create</code></label>
+      <div class="fb ok">Correct. The harness runs the loop for you from a declarative config — the default choice unless you need to own the orchestration.</div>
+      <div class="fb no">Not quite. The managed harness is the fastest, code-free path: you declare model, prompt, tools and memory, and AgentCore runs the loop.</div>
+    </div>
+    <div id="gate" class="gate">Answer both questions correctly to unlock Tier 3.</div>
+    <div class="linkrow" id="next" style="display:none">
+      <a class="btn" href="agentcore-tier-3.html?v=2026072801">Continue to Tier 3 →</a>
+    </div>
+  </section>
+
+  <div class="footer">SF Knowledge Hub · AgentCore Migration Lab · Tier 2</div>
+</div>
+
+<script>
+var solved={};
+var total=document.querySelectorAll('.mcq').length;
+document.querySelectorAll('.mcq').forEach(function(mcq,idx){
+  var answer=mcq.dataset.answer;
+  mcq.querySelectorAll('.opt input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      mcq.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+      var label=inp.closest('.opt');
+      var ok=mcq.querySelector('.fb.ok'), no=mcq.querySelector('.fb.no');
+      ok.classList.remove('show'); no.classList.remove('show');
+      if(inp.value===answer){
+        label.classList.add('correct'); ok.classList.add('show'); solved[idx]=true;
+      }else{
+        label.classList.add('wrong');
+        mcq.querySelector('.opt input[value="'+answer+'"]').closest('.opt').classList.add('correct');
+        no.classList.add('show'); solved[idx]=false;
+      }
+      if(Object.keys(solved).length===total && Object.values(solved).every(Boolean)){
+        document.getElementById('gate').style.display='none';
+        document.getElementById('next').style.display='flex';
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
