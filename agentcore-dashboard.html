@@ -1,0 +1,124 @@
+<!-- build: 2026072801 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AgentCore Migration Lab · SF Knowledge Hub</title>
+<link rel="stylesheet" href="lab.css?v=2026072801">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="../index.html">SF Knowledge Hub</a>
+    <span class="crumb">/ AgentCore Migration Lab</span>
+    <span class="spacer"></span>
+    <span class="pill">Hands-on lab</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Migrating to Amazon Bedrock AgentCore</h1>
+    <p class="sub">A hands-on lab. You will retire the old Starter Toolkit workflow, build and deploy an agent with the AgentCore CLI, and map a Bedrock Agents Classic configuration onto AgentCore. Leads to the SF Certified AgentCore Migration Practitioner certification.</p>
+    <div class="meta">
+      <span class="tag">AWS AI certification prep</span>
+      <span class="tag">AgentCore CLI</span>
+      <span class="tag">Bedrock Agents Classic</span>
+      <span class="tag">~90 min</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>Why this lab exists</h2>
+    <p class="lead">Two AWS changes landed close together, and AI certification questions now assume you know both.</p>
+    <p>First, the Python-based <strong>Bedrock AgentCore Starter Toolkit</strong> is no longer supported. The Node.js <strong>AgentCore CLI</strong> (<code>@aws/agentcore</code>) is its successor for creating, developing, and deploying agents. Second, the original <strong>Amazon Bedrock Agents</strong> service — now called <strong>Bedrock Agents Classic</strong> — entered maintenance mode and closes to new customers on <strong>July 30, 2026</strong>. AWS recommends migrating those workloads to AgentCore.</p>
+    <p>Put together: the tool you use to build changed, and the service you build on changed. This lab walks both, in the order an exam candidate needs to reason about them.</p>
+    <div class="note warn">
+      <span class="lbl">Read this first</span>
+      <p style="margin:6px 0 0">"Classic in maintenance mode" is not the same as "deleted." Existing Bedrock Agents Classic keep running; the service is closed to <em>new</em> agents for accounts without prior use. Exam distractors lean on this distinction — answer for maintenance mode, not removal.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What you'll do</h2>
+    <div class="tiers">
+
+      <div class="tier-card">
+        <div class="head">
+          <span class="tier-num">1</span>
+          <h3>Retire the Starter Toolkit, install the AgentCore CLI</h3>
+          <span class="lvl">Foundational</span>
+        </div>
+        <div class="body">
+          <ul>
+            <li>Recognise the deprecation and the command-name collision</li>
+            <li>Uninstall the legacy toolkit cleanly across pip / pipx / uv</li>
+            <li>Install <code>@aws/agentcore</code> and confirm prerequisites</li>
+          </ul>
+          <div class="linkrow">
+            <a class="btn" href="agentcore-tier-1.html?v=2026072801">Start Tier 1 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tier-card">
+        <div class="head">
+          <span class="tier-num">2</span>
+          <h3>Create, test, deploy and invoke an agent</h3>
+          <span class="lvl">Core workflow</span>
+        </div>
+        <div class="body">
+          <ul>
+            <li>Scaffold a project with <code>agentcore create</code></li>
+            <li>Run it locally with <code>agentcore dev</code></li>
+            <li>Ship it with <code>agentcore deploy</code> and call <code>agentcore invoke</code></li>
+          </ul>
+          <div class="linkrow">
+            <a class="btn" href="agentcore-tier-2.html?v=2026072801">Start Tier 2 →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tier-card">
+        <div class="head">
+          <span class="tier-num">3</span>
+          <h3>Map a Bedrock Agents Classic config onto AgentCore</h3>
+          <span class="lvl">Migration</span>
+        </div>
+        <div class="body">
+          <ul>
+            <li>Translate action groups, knowledge bases and prompt overrides</li>
+            <li>Choose between the managed harness and a code-based agent</li>
+            <li>Add tools, memory and observability the AgentCore way</li>
+          </ul>
+          <div class="linkrow">
+            <a class="btn" href="agentcore-tier-3.html?v=2026072801">Start Tier 3 →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Certification exam</h2>
+    <p class="lead">Complete all three tiers, then sit the exam to earn the SF Certified AgentCore Migration Practitioner certification.</p>
+    <div class="linkrow">
+      <a class="btn" href="agentcore-exam.html?v=2026072801">Go to exam →</a>
+      <a class="btn ghost" href="../index.html">Back to Knowledge Hub</a>
+    </div>
+  </section>
+
+  <div class="footer">
+    SF Knowledge Hub · AgentCore Migration Lab · Content reflects AWS guidance as of July 2026.
+    Verify against the <a href="https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-get-started-cli.html">AgentCore documentation</a> before an exam sitting, as versions move quickly.
+  </div>
+
+</div>
+</body>
+</html>
