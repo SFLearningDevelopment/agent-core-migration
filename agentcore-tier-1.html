@@ -1,0 +1,127 @@
+<!-- build: 2026072801 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tier 1 · AgentCore Migration Lab</title>
+<link rel="stylesheet" href="lab.css?v=2026072801">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="agentcore-dashboard.html?v=2026072801">AgentCore Migration Lab</a>
+    <span class="crumb">/ Tier 1</span>
+    <span class="spacer"></span>
+    <span class="pill">Foundational</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <h1>Tier 1 — Off the Starter Toolkit, onto the AgentCore CLI</h1>
+    <p class="sub">Before you can build anything the new way, you need the new tool installed and the old one out of the way. This tier is short but it removes a trap that breaks later commands.</p>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>The situation</h2>
+    <p>The <strong>Bedrock AgentCore Starter Toolkit</strong> was a Python CLI (installed with <code>pip install bedrock-agentcore-starter-toolkit</code>). It is now legacy and no longer supported. The <strong>AgentCore CLI</strong>, published as the npm package <code>@aws/agentcore</code>, replaces it.</p>
+    <p>Both expose the same command name — <code>agentcore</code>. If the old toolkit is still installed when you add the new CLI, the two collide and you can end up running commands against the wrong tool. So the first job in any migration is a clean uninstall.</p>
+
+    <details class="primer">
+      <summary>Primer: what actually changed, and what didn't</summary>
+      <div class="inner">
+        <p>What changed is the <em>developer tooling</em> and its language runtime: Python toolkit → Node.js CLI. What did <em>not</em> change is the platform underneath. Amazon Bedrock AgentCore — its Runtime, Memory, Gateway, Identity and Observability services — is still the destination. You are swapping the tool that scaffolds and deploys, not the thing you deploy to.</p>
+        <p>Keep those two layers separate in your head. Exam questions often test whether you can tell "the CLI changed" apart from "the runtime changed."</p>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Prerequisites</h2>
+    <table class="cmp">
+      <tr><th>Requirement</th><th>Why</th></tr>
+      <tr><td>Node.js 20+</td><td>The AgentCore CLI ships as an npm package.</td></tr>
+      <tr><td>Python 3.10+</td><td>The generated agent code is Python.</td></tr>
+      <tr><td>AWS CDK</td><td>The CLI uses CDK to provision AWS resources on deploy.</td></tr>
+      <tr><td>AWS credentials</td><td>Configured via <code>aws configure</code>, in a supported region.</td></tr>
+    </table>
+    <div class="note">
+      <span class="lbl">Note the split</span>
+      <p style="margin:6px 0 0">Node.js runs the CLI; Python runs the agent it generates. Needing both is expected, not a mistake.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Do it</h2>
+
+    <div class="step">
+      <div class="n">Step 1 · Remove the legacy toolkit</div>
+      <p>Uninstall with whichever installer you originally used:</p>
+      <pre><code>pip uninstall bedrock-agentcore-starter-toolkit     # installed via pip
+pipx uninstall bedrock-agentcore-starter-toolkit   # installed via pipx
+uv tool uninstall bedrock-agentcore-starter-toolkit # installed via uv</code></pre>
+      <p>If you're not sure how it was installed, checking all three is harmless.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 2 · Install the AgentCore CLI</div>
+      <pre><code>npm install -g @aws/agentcore</code></pre>
+      <p>If the old Python CLI is still present, the installer prints a warning asking you to uninstall it — that warning is your signal that Step 1 didn't fully take.</p>
+    </div>
+
+    <div class="step">
+      <div class="n">Step 3 · Confirm the new CLI answers</div>
+      <pre><code>agentcore --help</code></pre>
+      <p>You should see the AgentCore CLI's commands (<code>create</code>, <code>dev</code>, <code>deploy</code>, <code>invoke</code>, <code>add</code>, <code>remove</code>). If you instead see Python-toolkit output, the old command is still shadowing the new one — go back to Step 1.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Check your understanding</h2>
+    <div class="mcq" data-answer="b">
+      <div class="q">You install <code>@aws/agentcore</code> but <code>agentcore --help</code> still shows the old Python toolkit's output. What is the most likely cause?</div>
+      <label class="opt"><input type="radio" name="q1" value="a">Node.js is not version 20 or higher</label>
+      <label class="opt"><input type="radio" name="q1" value="b">The legacy Starter Toolkit is still installed and shares the <code>agentcore</code> command name</label>
+      <label class="opt"><input type="radio" name="q1" value="c">AWS credentials are not configured</label>
+      <label class="opt"><input type="radio" name="q1" value="d">The AgentCore Runtime service is in maintenance mode</label>
+      <div class="fb ok">Correct. Both CLIs use the <code>agentcore</code> command, so the old one must be uninstalled or it shadows the new CLI.</div>
+      <div class="fb no">Not quite. Both tools register the same <code>agentcore</code> command — if the old Python toolkit is still installed, it can shadow the new CLI. Uninstall it first.</div>
+    </div>
+    <div id="gate" class="gate">Answer the question correctly to unlock Tier 2.</div>
+    <div class="linkrow" id="next" style="display:none">
+      <a class="btn" href="agentcore-tier-2.html?v=2026072801">Continue to Tier 2 →</a>
+    </div>
+  </section>
+
+  <div class="footer">SF Knowledge Hub · AgentCore Migration Lab · Tier 1</div>
+</div>
+
+<script>
+document.querySelectorAll('.mcq').forEach(function(mcq){
+  var answer=mcq.dataset.answer;
+  mcq.querySelectorAll('.opt input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      mcq.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+      var chosen=inp.value, label=inp.closest('.opt');
+      var ok=mcq.querySelector('.fb.ok'), no=mcq.querySelector('.fb.no');
+      ok.classList.remove('show'); no.classList.remove('show');
+      if(chosen===answer){
+        label.classList.add('correct'); ok.classList.add('show');
+        var g=document.getElementById('gate'), n=document.getElementById('next');
+        if(g) g.style.display='none'; if(n) n.style.display='flex';
+      }else{
+        label.classList.add('wrong');
+        mcq.querySelector('.opt input[value="'+answer+'"]').closest('.opt').classList.add('correct');
+        no.classList.add('show');
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
