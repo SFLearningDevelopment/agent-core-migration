@@ -1,4 +1,4 @@
-<!-- build: 2026072801 -->
+<!-- build: 2026072802 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +11,7 @@
 
 <div class="topbar">
   <div class="wrap">
-    <a href="agentcore-dashboard.html?v=2026072801">AgentCore Migration Lab</a>
+    <a href="agentcore-dashboard.html?v=2026072802">AgentCore Migration Lab</a>
     <span class="crumb">/ Tier 3</span>
     <span class="spacer"></span>
     <span class="pill">Migration</span>
@@ -122,9 +122,12 @@ agentcore add tool --harness my-research-agent \
       <div class="fb ok">Correct. Maintenance mode closes Classic to new agents; it does not remove Bedrock models, Knowledge Bases or Guardrails.</div>
       <div class="fb no">Not quite. Maintenance mode only closes Classic to new customers — Bedrock models, Knowledge Bases and Guardrails keep working and can be reused.</div>
     </div>
-    <div id="gate" class="gate">Answer both questions correctly to unlock the certification exam.</div>
+    <div id="gate" class="gate">Answer both questions correctly to complete this tier.</div>
     <div class="linkrow" id="next" style="display:none">
-      <a class="btn" href="agentcore-exam.html?v=2026072801">Go to the exam →</a>
+      <span class="status done">Tier complete</span>
+    </div>
+    <div class="linkrow" style="margin-top:14px">
+      <a class="btn ghost" href="agentcore-dashboard.html?v=2026072802">← Back to dashboard</a>
     </div>
   </section>
 
